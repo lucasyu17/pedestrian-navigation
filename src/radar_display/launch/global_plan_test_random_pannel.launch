@@ -1,0 +1,6 @@
+<launch>
+    <node name="global_path_test_world" pkg="radar_display" type="global_path_test_world_random" output="screen">
+    </node>
+    <!-- <node name="lantern_with_pannel" pkg="radar_display" type="lantern_with_pannel" output="screen">
+    </node> -->
+</launch>

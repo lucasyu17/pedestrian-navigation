@@ -1,0 +1,19 @@
+1.
+source chg_workspace/turtle_bot_ws/devel/setup.bash
+roslaunch turtlebot_gazebo trutlebot_chg_world_test_color_ground.launch x:=-15 y:=-7.5
+
+2. 
+roslaunch eed_display pub_lantern_and_display.launch display_type:=depth_semantic
+
+3. 随机生成轨迹点
+roslaunch radar_display global_plan_test_random_pannel.launch
+
+4. yolo
+roslaunch darknet_ros yolo_v3.launch
+
+5. 启动灯笼图像发布程序并显示当前仪表等
+roslaunch eed_display pub_lantern_and_display.launch display_type:=depth_semantic
+
+6. RL训练代码
+python /home/ubuntu/chg_workspace/turtle_bot_ws/src/DDPG/start_training.py
+

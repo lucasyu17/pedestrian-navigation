@@ -1,0 +1,70 @@
+*对所有以下的执行前指令均需要source
+source /home/ubuntu/chg_workspace/turtle_bot_ws/devel/setup.bash
+
+1. 启动Gazebo模型及世界，launch在 turtlebot_gazebo/launch中 如 
+roslaunch turtlebot_gazebo trutlebot_test_world.launch x:=-16.0 y:=-6.5
+
+新建的世界 
+roslaunch turtlebot_gazebo trutlebot_chg_world.launch x:=-19 y:=0
+
+测试世界
+roslaunch turtlebot_gazebo trutlebot_chg_world_test.launch x:=-15 y:=-10.5
+
+测试世界,白色地面:
+roslaunch turtlebot_gazebo trutlebot_chg_world_test_color_ground.launch x:=-15 y:=-7.5
+
+
+（此launch中添加了x, y初始位置可以选择）
+* 注意此处的启动位置应当与全局规划导航仪表 hybrid_local_map/radar_display/src/global_path.cpp中的初始位置保持一致！！！
+
+2. 记录执行数据
+执行：
+rosrun uavInfo recordRouteSimCrowded
+
+3. 启动驱动ps4_joy，通道映射在ps4_joy.cpp可更改，速度限制可在launch直接改
+roslaunch turtlebot_teleop ps4_joy.launch
+(注： 2. 开启joy stick : 已经加入 ps4_joy.launch
+rosrun joy joy_node  (启动不成功的话里面设备号可能要换))
+
+*对所有以下的执行前指令均不不不不需要source（已经在bashrc中）
+
+4. 启动灯笼图像发布程序并显示当前仪表等
+roslaunch eed_display pub_lantern_and_display.launch display_type:=depth_semantic
+
+display_type候选项： depth_semantic, depth, rgb
+默认为rgb
+
+5. 启动全局规划导航仪表(可在cpp中修改全局路径) 以及 启动灯笼程序
+roslaunch radar_display global_plan.launch
+
+测试时:
+roslaunch radar_display global_plan_pannel.launch
+
+测试场景时:
+roslaunch radar_display global_plan_test_pannel.launch
+
+或者单独执行
+rosrun radar_display global_path
+rosrun secure_flying lantern
+
+以上即可操作进行数据采集
+采集指令为：
+cd /home/ubuntu/chg_workspace/data/training_bags
+
+rosbag record --split --size 4096 /camera/depth/points /camera/rgb/image_raw /odom /radar/current_point /radar/current_yaw /radar/target_yaw /radar/delt_yaw /radar/target_point /teleop_velocity_smoother/raw_cmd_vel /mobile_base/commands/velocity /radar/direction 
+
+
+6.需要地图启动mapping，在另一个catkin_ws中，节点名称 mapping_turtlebot
+rosrun secure_flying mapping_turtlebot
+
+7.需要语义地图启动，则要启动yolo
+/home/ubuntu/catkin_ws/src/hybrid_local_map/darknet_ros/darknet_ros/config/ros.yaml中修改话题名称
+Rotors 为 /firefly/vi_sensor/camera_depth/camera/image_raw， Turtlebot为/camera/rgb/image_raw
+
+roslaunch darknet_ros yolo_v3.launch
+
+
+* 其他文件重要修改
+/home/ubuntu/chg_workspace/turtle_bot_ws/src/gazebo_ros_pkgs/gazebo_plugins/src/gazebo_ros_openni_kinect.cpp
+中的pointCloudCutoff、pointCloudCutoffMax参数值来改变传感器检测距离，现在改到了8m，原来5m
+

@@ -1,0 +1,31 @@
+*对所有以下的执行前指令均需要source
+source ../devel/setup.bash
+
+1. 启动Gazebo模型及新建的世界 
+roslaunch turtlebot_gazebo trutlebot_chg_world.launch x:=-19 y:=0
+
+（此launch中添加了x, y初始位置可以选择）
+* 注意此处的启动位置应当与全局规划导航仪表 hybrid_local_map/radar_display/src/global_path.cpp中的初始位置保持一致！！！
+
+
+2. 启动驱动ps4_joy，通道映射在ps4_joy.cpp可更改，速度限制可在launch直接改
+roslaunch turtlebot_teleop ps4_joy.launch
+
+
+*对所有以下的执行前指令均不不不不需要source（已经在bashrc中）
+
+3. 启动全局规划导航仪表(可在cpp中修改全局路径) 以及 启动灯笼程序
+roslaunch radar_display global_plan.launch
+
+4.需要语义地图启动，则要启动yolo
+rosrun secure_flying mapping_turtlebot
+roslaunch darknet_ros yolo_v3.launch
+
+6.启动写csv的节点
+rosrun uavInfo processDataOrigin
+
+如果需要bag储存数据:
+采集指令为：
+cd /home/ubuntu/chg_workspace/data/training_bags
+
+rosbag record --split --size 4096 /camera/depth/points /camera/rgb/image_raw /camera/depth/image_raw /odom /radar/current_point /radar/current_yaw /radar/target_yaw /radar/delt_yaw /radar/target_point /teleop_velocity_smoother/raw_cmd_vel /mobile_base/commands/velocity /radar/direction 
